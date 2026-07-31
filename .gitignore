@@ -1,0 +1,13 @@
+# Compiled C++ files
+*.o
+orchestration
+can_simulator
+
+# macOS
+.DS_Store
+
+# VS Code
+.vscode/
+
+# Secrets
+.env
