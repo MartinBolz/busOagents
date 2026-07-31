@@ -140,10 +140,13 @@ void AgentNode::completeCurrentTask() {
 }
 
 
+//process frame rejects messages that are not designated for the AgentNode instance
 void AgentNode::process_frame(const CANFrame& frame){
     if (frame.target_id != getID() && frame.target_id != 0){
         return;
     }
+
+    logProcessedMsgQueue.push_back(frame);
 
     switch (frame.identifier)
     {

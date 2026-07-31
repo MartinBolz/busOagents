@@ -42,7 +42,8 @@ private:
     void handle_replace_task(const CANFrame& frame);
 
 
-    //process frame dispatches the handles for the appropriate command sent across
+    //process frame dispatches the handles for the appropriate command sent across the CANbus
+    //it rejects messages that are not designated for the AgentNode instance
     void process_frame(const CANFrame& frame) override;
 
     //returns the current task
@@ -70,6 +71,9 @@ private:
 
     
     std::queue<CANFrame> taskqueue;
+
+    //this vector stores all the messages from the bus that were processed by the Agent
+	std::vector<CANFrame> logProcessedMsgQueue;
 
 };
 

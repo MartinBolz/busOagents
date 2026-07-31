@@ -66,14 +66,8 @@ class CANNode{
     std::string name;
 
 	
-	//this vector stores all of the messages from the bus regardless who sent it
-	std::priority_queue<CANFrame> receive_msg_queue;
-
-	//this vector stores all the messages from the bus that were processed
-	std::vector<CANFrame> logProcessedMsgQueue;
-	//this vector stores all the messages ever sent from this node
-	std::vector<CANFrame> logTransmissions;
-	
+	//this sorts and stores all of the messages from the bus regardless who sent it
+	std::priority_queue<CANFrame> inbox;
 };
 
 #endif

@@ -1,5 +1,5 @@
-#include "CANNode.h"
-#include "CANBus.h"
+#include "../include/CANNode.h"
+#include "../include/CANBus.h"
 
 #include <iostream>
 
@@ -20,18 +20,7 @@ void CANNode::NodeInfo(){
         std::cout << "Not connected to any bus." << std::endl;
     }
 
-    for (auto& frame : logTransmissions) {
-        std::cout << "Transmit Frame - Identifier: "         
-                << std::hex
-                << static_cast<std::uint16_t>(frame.identifier)
-                << std::dec  
-                << ", target: " << frame.target_id
-                << ", task_id: " << frame.task_id
-                << ", Sender: " << frame.sender 
-                << ", prompt " << frame.prompt << std::endl;
-    }
-
-    auto temp_queue = receive_msg_queue;
+    auto temp_queue = inbox;
 
     while (!temp_queue.empty()) {
         const auto& frame = temp_queue.top();
@@ -41,17 +30,6 @@ void CANNode::NodeInfo(){
                 << ", target: " << frame.target_id << std::endl;
 
         temp_queue.pop();
-    }
-
-    for (auto& frame : logProcessedMsgQueue) {
-        std::cout << "logProcessedMsgQueue Frame - Identifier: "   
-                << std::hex
-                << static_cast<std::uint16_t>(frame.identifier)
-                << std::dec                  
-                << ", target: " << frame.target_id
-                << ", task_id: " << frame.task_id
-                << ", Sender: " << frame.sender 
-                << ", prompt " << frame.prompt << std::endl;
     }
 
     std::cout << "--------------------" << std::endl;
@@ -73,9 +51,8 @@ void CANNode::request_transmission(const CANFrame& frame){
         return;
     }
 
-    //arbitrate the frame and log its presence in general
+    //arbitrate the frame 
     bus->arbitrate(frame);
-    logTransmissions.push_back(frame);
 
     std::cout << name
         << " submitted frame 0x"
@@ -96,29 +73,27 @@ void CANNode::receive_frame(const CANFrame &frame){
         return; 
     }
 
-    receive_msg_queue.push(frame);
+    inbox.push(frame);
 
     std::cout << name << " received frame with identifier: " 
         << std::hex << static_cast<std::uint16_t>(frame.identifier) << std::dec  
         << " with id task_id of: " << frame.task_id 
         << " and from sender: "<< frame.sender << std::endl;
-    logProcessedMsgQueue.push_back(frame);
 }
 
+//process next frame tells the node to process the most important message from its inbox
+//process_frame is overriden for the AgentNode class to accept the message or reject it.
 void CANNode::process_next_frame(){
-    if (receive_msg_queue.empty()){
+    if (inbox.empty()){
         return;
     }
-
-    CANFrame frame = receive_msg_queue.top();
-    receive_msg_queue.pop();
-
-    process_frame(frame);
-    logProcessedMsgQueue.push_back(frame);
+    process_frame(inbox.top());
+    inbox.pop();
 }
 
+//process frame is a virtual function for all of its children 
 void CANNode::process_frame(const CANFrame& frame) {
-    // Generic CAN nodes do not interpret agent commands.
+    // Generic CAN nodes do not interpret frames, they only handle sending them out to its children
 }
 
 

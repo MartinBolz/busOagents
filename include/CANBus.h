@@ -18,6 +18,12 @@
 
 class CANNode;
 
+enum class BusState {
+    Idle,
+    Transmitting,
+    NodesProcessing
+};
+
 class CANBus{
 	public:
 	CANBus(std::string name);
@@ -27,10 +33,11 @@ class CANBus{
 
 	void arbitrate(const CANFrame &frame);
 
-	void process_transmission();
+	void transmit();
 
+	void nodesProcessMsg();
 
-	bool is_bus_busy() const;
+	BusState CANBus::state() const;
 
 	const std::string& getBusName() const;
 
@@ -39,8 +46,11 @@ class CANBus{
 
 	private:
 
+
 	//this needs to check if the bus is busy and if it is not then it needs to broadcast the frame to all connected nodes.
-	void broadcast_frame(CANFrame frame);
+	void broadcast_frame(const CANFrame &frame);
+
+	std::string printState() const;
 
 	//all of the nodes connected to the CANBUS
 	std::vector<CANNode *> connectedNodes;
@@ -48,9 +58,7 @@ class CANBus{
 	//arbitration is solved by the inverted < between MsgTypes in a Frame
 	std::priority_queue<CANFrame> arbitration;
 	
-	CANFrame currentFrame;
-	bool busBusy;	
-	bool processingPhase = false;
+	BusState myState = BusState::Idle;
 	std::string BusName;
 };
 
