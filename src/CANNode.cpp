@@ -99,9 +99,7 @@ void CANNode::receive_frame(const CANFrame &frame){
     receive_msg_queue.push(frame);
 
     std::cout << name << " received frame with identifier: " 
-        << std::hex
-        << static_cast<std::uint16_t>(frame.identifier)
-        << std::dec  
+        << std::hex << static_cast<std::uint16_t>(frame.identifier) << std::dec  
         << " with id task_id of: " << frame.task_id 
         << " and from sender: "<< frame.sender << std::endl;
     logProcessedMsgQueue.push_back(frame);

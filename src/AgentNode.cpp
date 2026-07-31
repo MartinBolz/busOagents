@@ -3,10 +3,10 @@
 #include <iostream>
 #include <queue>
 
-#include "CANBus.h"
-#include "CANNode.h"
-#include "CANFrame.h"
-#include "AgentNode.h"
+#include "../include/CANBus.h"
+#include "../include/CANNode.h"
+#include "../include/CANFrame.h"
+#include "../include/AgentNode.h"
 
 AgentNode::AgentNode(int id, const std::string& name): CANNode(id, name){} // Call the base class constructor
 

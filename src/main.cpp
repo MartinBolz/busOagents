@@ -1,10 +1,10 @@
 #include <iostream>
 #include <string> 
 #include <vector>
-#include "CANBus.h"
-#include "CANNode.h"
-#include "CANFrame.h"
-#include "AgentNode.h"
+#include "../include/CANBus.h"
+#include "../include/CANNode.h"
+#include "../include/CANFrame.h"
+#include "../include/AgentNode.h"
 
 int main() {
     CANBus bus("communication");

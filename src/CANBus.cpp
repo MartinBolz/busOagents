@@ -7,8 +7,8 @@
 
 */
 
-#include "CANBus.h"
-#include "CANNode.h"
+#include "../include/CANBus.h"
+#include "../include/CANNode.h"
 
 #include <iostream>
 

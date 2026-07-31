@@ -2,14 +2,14 @@
 #include <vector>
 #include <chrono>
 #include <cstdlib>
-#include "CANBus.h"
-#include "AgentNode.h"
+#include "../include/CANBus.h"
+#include "../include/AgentNode.h"
 
 int main() {
     CANBus bus("StressTestBus");
     std::vector<AgentNode*> agents;
 
-    const int NUM_AGENTS = 5000;
+    const int NUM_AGENTS = 50000;
     const int MESSAGES_PER_AGENT = 20;
     const int TOTAL_MESSAGES = NUM_AGENTS * MESSAGES_PER_AGENT;
 
