@@ -141,7 +141,7 @@ void AgentNode::completeCurrentTask() {
 
 
 void AgentNode::process_frame(const CANFrame& frame){
-    if (frame.target_id != getID()){
+    if (frame.target_id != getID() && frame.target_id != 0){
         return;
     }
 

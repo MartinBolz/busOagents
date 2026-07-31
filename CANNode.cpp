@@ -31,15 +31,16 @@ void CANNode::NodeInfo(){
                 << ", prompt " << frame.prompt << std::endl;
     }
 
-    for (auto& frame : receive_msg_queue) {
-        std::cout << "Receive Queue Frame - Identifier: " 
-                << std::hex
-                << static_cast<std::uint16_t>(frame.identifier)
-                << std::dec 
-                << ", target: " << frame.target_id
-                << ", task_id: " << frame.task_id
-                << ", Sender: " << frame.sender 
-                << ", prompt " << frame.prompt << std::endl;
+    auto temp_queue = receive_msg_queue;
+
+    while (!temp_queue.empty()) {
+        const auto& frame = temp_queue.top();
+        
+        std::cout << "Receive Queue Frame - Identifier: 0x" 
+                << std::hex << static_cast<std::uint16_t>(frame.identifier) << std::dec 
+                << ", target: " << frame.target_id << std::endl;
+
+        temp_queue.pop();
     }
 
     for (auto& frame : logProcessedMsgQueue) {
@@ -90,7 +91,12 @@ void CANNode::request_transmission(const CANFrame& frame){
 
 
 void CANNode::receive_frame(const CANFrame &frame){
-    receive_msg_queue.push_back(frame);
+    // Simulate a hardware filter: Ignore frames not meant for us (0 is broadcast)
+    if (frame.target_id != id && frame.target_id != 0) {
+        return; 
+    }
+
+    receive_msg_queue.push(frame);
 
     std::cout << name << " received frame with identifier: " 
         << std::hex
@@ -106,8 +112,8 @@ void CANNode::process_next_frame(){
         return;
     }
 
-    CANFrame frame = receive_msg_queue.front();
-    receive_msg_queue.erase(receive_msg_queue.begin());
+    CANFrame frame = receive_msg_queue.top();
+    receive_msg_queue.pop();
 
     process_frame(frame);
     logProcessedMsgQueue.push_back(frame);
