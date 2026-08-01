@@ -15,7 +15,7 @@ void CANNode::NodeInfo(){
     std::cout << "Node ID: " << id << std::endl;
     std::cout << "Node Name: " << name << std::endl;
     if (bus) {
-        std::cout << "Connected to Bus: " << bus->getBusName() << std::endl;
+        std::cout << "Connected to Bus: " << getBusName() << std::endl;
     } else {
         std::cout << "Not connected to any bus." << std::endl;
     }
@@ -100,10 +100,17 @@ void CANNode::process_frame(const CANFrame& frame) {
 //Connect bus is called only inside of CANBUS obj when the CANBUS::connect_node()node is called.
 void CANNode::connectBus(CANBus* newBus){
     this->bus = newBus;
+    busName = bus->getBusName();
 }
+
+
 
 const std::string& CANNode::getName() const {
     return name;
+}
+
+const std::string& CANNode::getBusName() const{
+    return busName;
 }
 
 int CANNode::getID() const {

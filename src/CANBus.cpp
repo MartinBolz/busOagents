@@ -95,7 +95,7 @@ void CANBus::nodesProcessMsg(){
 //arbitrate the frame depending on the MsgType this is because arbitration is a priority queue.
 void CANBus::arbitrate(const CANFrame &frame){
     std::cout << BusName 
-    << " arbitrated frame" 
+    << " arbitrated frame " 
     << std::hex << static_cast<uint16_t>(frame.identifier) << std::dec 
     << " from " << frame.sender << std::endl;
 

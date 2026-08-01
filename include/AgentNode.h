@@ -14,8 +14,14 @@ public:
         const std::string& prompt
     );
 
+    //stops all agents on the bus and resets them, big red button stop everyting!
+    //this should really be handled by a controller node, but I am defining a human/controller agent
+    void emergencyStop();
+
     //tell a target to stop its task
     void stop_task(int target, int taskID);
+
+    
 
     //tell a target to update a task's prompt, not to pivot to a different task.
     void replace_task(
@@ -40,6 +46,7 @@ private:
     void handle_new_task(const CANFrame& frame);
     void handle_stop_task(const CANFrame& frame);
     void handle_replace_task(const CANFrame& frame);
+    void handle_emergency_stop(const CANFrame& frame);
 
 
     //process frame dispatches the handles for the appropriate command sent across the CANbus
@@ -55,11 +62,14 @@ private:
     //this is ran after a stopping event or when a completed event happens
     void runNextTask();
 
-    //this resets the agent to the default
+    //this resets the agent to the default keeps its taskQueue
     void resetAgent();
 
+    //this resets the agent to the default with empty taskQueue only called my emergency stop
+    void emegencyResetAgent();
+
     //used for keeping state
-    NodeState currentState;
+    NodeState currentState = NodeState::Idle;
 
     //currentTaskID gets assigned when it receives a task
     int currentTaskID = -1;

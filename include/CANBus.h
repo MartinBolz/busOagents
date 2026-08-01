@@ -37,7 +37,7 @@ class CANBus{
 
 	void nodesProcessMsg();
 
-	BusState CANBus::state() const;
+	BusState state() const;
 
 	const std::string& getBusName() const;
 

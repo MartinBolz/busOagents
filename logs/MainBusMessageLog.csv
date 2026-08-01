@@ -1,0 +1,10 @@
+Target,MsgType,Sender,TaskID,Prompt
+1,100,3,0,"Tell me something interesting about beer."
+2,100,1,0,"Explain how beer fermentation works."
+1,20,3,-1,"Focus specifically on the history of beer brewing."
+2,20,1,0,"Give a short explanation of yeast's role in fermentation."
+2,10,3,0,""
+1,10,3,9999,""
+1,10,3,0,""
+1,100,3,1,"Describe the ingredients used to make beer."
+2,100,3,2,"Describe the difference between ale and lager."

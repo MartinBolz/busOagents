@@ -36,7 +36,7 @@ class CANNode{
 	void request_transmission(const CANFrame & frame);
 	
 	//this function is called by the bus to send a frame to this node, and it adds the frame to the receive queue.
-	void receive_frame(const CANFrame &frame);
+	virtual void receive_frame(const CANFrame &frame);
 
 	void process_next_frame();
 
@@ -46,7 +46,9 @@ class CANNode{
 
 	//getters
     const std::string& getName() const;
-    int getID() const;
+    const std::string& getBusName() const;
+	int getID() const;
+	
 
 
 	protected:
@@ -63,6 +65,7 @@ class CANNode{
 
 	int id;	
 	CANBus* bus;
+	std::string busName;
     std::string name;
 
 	

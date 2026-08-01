@@ -15,7 +15,7 @@ int AgentNode::new_task(int target, const std::string& prompt) {
     int taskID = nextTask();
 
     //remember that each CANNode gets assigned a unique ID when an AgentNode is created.
-    CANFrame frame(target, CANFrame::MsgType::NewTask, CANNode::getID(), taskID, prompt);
+    CANFrame frame(target, CANFrame::MsgType::NewTask, getID(), taskID, prompt);
     request_transmission(frame);
     return taskID;
 }
@@ -45,24 +45,70 @@ void AgentNode::handle_new_task(const CANFrame& frame){
     << std::endl;
 }
 
-//this resets the agent to its default
+//this resets the agent to its default along with keeping its taskQueue
 void AgentNode::resetAgent(){
     currentPrompt = "";
     currentTaskID = -1;
     currentState = NodeState::Idle;
+
 }
 
+//this resets the agent to the default with empty taskQueue only called my emergency stop
+void AgentNode::emegencyResetAgent(){
+    resetAgent();
+    while (!taskqueue.empty()){
+        taskqueue.pop();
+    }
+    
+}
+
+//stop everything on the bus and reset agents
+//the controller/human agent must reassign each tasks to the agents after this 
+void AgentNode::emergencyStop(){
+    //the target is zero meaning it is for all agents on the bus
+    CANFrame frame(0, CANFrame::MsgType::EmergencyStop, getID(), -1, "");
+    request_transmission(frame);
+}
+
+void AgentNode::handle_emergency_stop(const CANFrame& frame){
+    //dont stop the task if its not my Id and is not an emergency stop target 
+    if (frame.target_id != getID() && frame.target_id != 0){
+        return;
+    }
+    
+    currentState = NodeState::Stopping;
+
+    std::cout << getName() 
+    << " Emergency Stopped Exececution " 
+    << currentTaskID << std::endl;
+
+    emegencyResetAgent();
+
+}
 
 //this sends stop_task to a target and sends it onto the bus.
 void AgentNode::stop_task(int target, int taskID){
-    CANFrame frame(target, CANFrame::MsgType::StopTask, CANNode::getID(), taskID, "");
+    CANFrame frame(target, CANFrame::MsgType::StopTask, getID(), taskID, "");
     request_transmission(frame);
 
 }
 
 
 void AgentNode::handle_stop_task(const CANFrame& frame){
+    //dont stop the task if its not for me
+    if (frame.target_id != getID()){
+        return;
+    }
     
+    //dont stop the task if I am idle
+    if (currentState == NodeState::Idle){
+        return;
+    }
+
+    //dont stop my current task matches if it doesn't match my taskID 
+    if (frame.task_id != myTaskID()){
+        return;
+    }
     currentState = NodeState::Stopping;
 
     std::cout << getName() 
@@ -85,13 +131,21 @@ void AgentNode::handle_stop_task(const CANFrame& frame){
 */
 
 //this sends a message to a target on the bus to replace its current prompt
-//replace task is only used to refine a prompt, not to pivot to a new task
+//replace task is only used to refine a prompt, not to pivot to a new task so it will keep the same taskID
 void AgentNode::replace_task(int target, const std::string& prompt) {
-    CANFrame frame(target, CANFrame::MsgType::ReplaceTask, CANNode::getID(), myTaskID(), prompt);
+    CANFrame frame(target, CANFrame::MsgType::ReplaceTask, getID(), myTaskID(), prompt);
     request_transmission(frame);
 }
 
 void AgentNode::handle_replace_task(const CANFrame &frame){
+    if (frame.target_id != getID()){
+        return;
+    }
+
+    if (currentState != NodeState::Working) {
+        return;
+    }
+    
     currentState = NodeState::Working;
 
     std::cout << getName() << " old prompt was: " << currentPrompt;
@@ -150,6 +204,10 @@ void AgentNode::process_frame(const CANFrame& frame){
 
     switch (frame.identifier)
     {
+        case CANFrame::MsgType::EmergencyStop:
+            handle_emergency_stop(frame);
+            break;
+
         case CANFrame::MsgType::NewTask:
             handle_new_task(frame);
             break;
@@ -160,6 +218,18 @@ void AgentNode::process_frame(const CANFrame& frame){
         
         case CANFrame::MsgType::ReplaceTask:
             handle_replace_task(frame);
+            break;
+
+        case CANFrame::MsgType::ReviewRequest:
+            std::cout << "\t reviewing request not implemented yet: but will send the results of what the agent did researched/solved/planned ect... to another agent" << std::endl;
+            break;
+        
+        case CANFrame::MsgType::AgentResult:
+            std::cout << "\t Agent results not implemented yet: but it will return what the agent did researched/solved/planned ect..." << std::endl;
+            break;
+        
+        case CANFrame::MsgType::nullMsg:
+            //this should never ever happen will probably have to use an std::optional to replace a nullMSG
             break;
 
         default:
