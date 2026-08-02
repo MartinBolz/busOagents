@@ -8,38 +8,47 @@ class AgentNode : public CANNode {
 public:
     AgentNode(int id, const std::string& name);
 
-    //tell a target to pivot to a new task, increment the taskID
+    // Creates and submits a NewTask frame for another agent.
+    // target: ID of the agent receiving the task.
+    // prompt: description of the work to perform.
+    // Returns the task ID assigned by this sender.
     int new_task(
         int target,
         const std::string& prompt
     );
 
-    //stops all agents on the bus and resets them, big red button stop everyting!
-    //this should really be handled by a controller node, but I am defining a human/controller agent
+    // Broadcasts an emergency-stop frame to every agent on the bus.
+    // Receiving agents stop their current task and clear queued tasks.
     void emergencyStop();
 
-    //tell a target to stop its task
+    // Requests that a target agent stop a particular task.
+    // The target ignores the request if taskID is not its current task.
     void stop_task(int target, int taskID);
 
     
 
     //tell a target to update a task's prompt, not to pivot to a different task.
+    // Updates the prompt of the target agent's active task without
+    // assigning a new task ID.
     void replace_task(
         int target,
         const std::string& prompt
     );
 
     enum class NodeState{
-	    Idle,
-		Working,
-		Stopping,
-		Error,
-		Completed
+	    Idle, //No active task
+		Working, //Currently Working on a task
+		Stopping, //Transition away from a task
+		Error, //error orrcured
+		Completed //current task completed waiting next task
 	};
 
 
 
 private:
+    //this is not implemented but it will change the nodes state
+    //probably also will reset the agent
+    //and send a frame to the assigner of the task with a report message
     void completeCurrentTask();
 
     //these handles are for reacting to a frame and to are dispatched by process frame!
@@ -53,12 +62,13 @@ private:
     //it rejects messages that are not designated for the AgentNode instance
     void process_frame(const CANFrame& frame) override;
 
-    //returns the current task
+    //returns the current taskID
     int myTaskID();
     
     //returns the nextTaskId by incrementing when a new task is called
     int nextTask();
 
+    //not implemented yet
     //this is ran after a stopping event or when a completed event happens
     void runNextTask();
 

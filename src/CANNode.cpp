@@ -92,8 +92,9 @@ void CANNode::process_next_frame(){
 }
 
 //process frame is a virtual function for all of its children 
+// Generic CAN nodes do not interpret frames, they only handle sending them out to its children
 void CANNode::process_frame(const CANFrame& frame) {
-    // Generic CAN nodes do not interpret frames, they only handle sending them out to its children
+    
 }
 
 

@@ -3,6 +3,17 @@
 
 #include <string>
 
+/*
+CANFrame represents one message transmitted across the simulated CAN bus.
+
+Each frame contains:
+- the target node ID
+- the message type and arbitration priority
+- the sender node ID
+- a task ID
+- a text prompt or message payload
+*/
+
 class CANFrame {
 public:
     //These are the message types that can be sent on the bus. They are used to identify the type of message being sent.

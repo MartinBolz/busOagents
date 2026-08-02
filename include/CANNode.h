@@ -38,15 +38,27 @@ class CANNode{
 	//this function is called by the bus to send a frame to this node, and it adds the frame to the receive queue.
 	virtual void receive_frame(const CANFrame &frame);
 
+	//process next frame tells the node to process the most important message from its inbox
+	//process_frame is overriden for the AgentNode class to accept the message or reject it.
 	void process_next_frame();
 
+	//process frame is a virtual function for all of its children 
+	// Generic CAN nodes do not interpret frames, they only handle sending them out to its children
 	virtual void process_frame(const CANFrame &frame); 
+
+	//this destructor is virtual so it allows CANNodes children to do specific cleanup when a node is deleted
 	virtual ~CANNode() = default;
 
 
 	//getters
+
+	//returns the name of the node
     const std::string& getName() const;
-    const std::string& getBusName() const;
+    
+	//returns the name of the bus its attached too
+	const std::string& getBusName() const;
+	
+	//returns the node's unique id
 	int getID() const;
 	
 
@@ -56,9 +68,6 @@ class CANNode{
 	void create_frame(int target, CANFrame::MsgType msgType, int taskId, const std::string& data);
 	
 	private:
-	
-
-	void transmit_frame(const CANFrame& frame);
 
 	//Connect bus is called only inside of CANBUS obj when the CANBUS::connect_node()node is called.
 	void connectBus(CANBus* bus);

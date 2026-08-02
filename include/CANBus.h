@@ -26,21 +26,31 @@ enum class BusState {
 
 class CANBus{
 	public:
+	//creates a bus with a name given
 	CANBus(std::string name);
+	
+	//prints the bus with the provided display name
 	void CANBusPrint();
 
+	//adds a node to the network to and gives the node arefernce to this bus
 	void connect_node(CANNode* node);
 
+	//places a frame into arbitration priority queue changes the state of the bus
 	void arbitrate(const CANFrame &frame);
 
+	//removes the highest priority frame and broadcasts to all connected nodes
 	void transmit();
 
+	//Allows every connected node to process one queued message
 	void nodesProcessMsg();
 
+	//returns the current state of the bus
 	BusState state() const;
 
+	//returns the name of the bus
 	const std::string& getBusName() const;
 
+	//advances the simulation by one bus phase
 	void tick();
 
 
